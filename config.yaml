@@ -1,0 +1,41 @@
+networks:
+- name: cosmos
+  rpc: http://127.0.0.1:26657
+  api: http://127.0.0.1:1317
+  decimals: 6
+  denom: uatom
+  symbol: ATOM
+  type: cosmos
+  wallets:
+  - name: validator
+    address: cosmos1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj
+  - name: delegator
+    address: cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew
+- name: axelar
+  rpc: http://127.0.0.1:26657
+  api: http://127.0.0.1:1317
+  decimals: 6
+  denom: uaxl
+  symbol: AXL
+  type: cosmos
+  wallets:
+  - name: vald-operator
+    address: axelar1gswfh88s88s2evtsutwt8heh59jttjglhdlwtw3
+  - name: validator
+    address: axelar1gswfh88s88s2evtsu34t8heh59jttjglhdlwtwj
+  - name: delegator
+    address: axelar1gswfh88s88s2evtsutwt8he4559jttjglhdlwtl
+- name: umee
+  rpc: http://127.0.0.1:26657
+  api: http://127.0.0.1:1317
+  decimals: 6
+  denom: uumee
+  symbol: UMEE
+  type: cosmos
+  wallets:
+  - name: vald-operator
+    address: axelar1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj
+  - name: validator
+    address: axelar1gswfh8s823s2evtsutwt8heh59jttjglhdlwtwk
+  - name: delegator
+    address: axelar112wfh88s88s2evtsutwt8heh59jttjglhdlwtwl

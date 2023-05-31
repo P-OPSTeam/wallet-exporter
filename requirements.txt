@@ -1,0 +1,5 @@
+prometheus_client
+requests
+python-dotenv
+pyyaml
+structlog

@@ -1,0 +1,5 @@
+.venv
+.env
+.vscode
+config.local.yaml
+__pycache__
