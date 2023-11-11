@@ -16,7 +16,7 @@ class AppMetrics:
   application metrics into Prometheus metrics.
   """
 
-  def __init__(self, polling_interval_seconds=15, walletconfig=False, logging=False):
+  def __init__(self, polling_interval_seconds=60, walletconfig=False, logging=False):
     self.polling_interval_seconds = polling_interval_seconds
 
     self.logging = logging
@@ -101,7 +101,7 @@ def main():
  
   log.debug(f"Loading .env")
   load_dotenv() # take environment variables from .env
-  polling_interval_seconds = int(os.getenv("POLLING_INTERVAL_SECONDS", "15"))
+  polling_interval_seconds = int(os.getenv("POLLING_INTERVAL_SECONDS", "60"))
   exporter_port = int(os.getenv("EXPORTER_PORT", "9877"))
 
   log.info("Wallet Exporter started and now listening on port " + str(exporter_port))
