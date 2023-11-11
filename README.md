@@ -44,6 +44,9 @@ sudo systemctl start wallet-exporter
 
 ```
 curl -s localhost:9877/metric
+
+account_balance{address="cosmos1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj",name="validator",network="cosmos"} 54.451031
+account_balance{address="cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew",name="delegator",network="cosmos"} 25600.995009
 ```
 # TODO
 

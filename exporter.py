@@ -21,18 +21,12 @@ class AppMetrics:
 
     self.logging = logging
     self.logging.info("Init the Appmetrics class")
-    # all metrics are defined below
-    self.metrics = {}   
     self.walletconfig=walletconfig
+
+    # all metrics are defined below
+    self.account_balance = Gauge("account_balance", "account balance", ["address", "name", "network"])
+
     logging.debug(walletconfig)
-    for network in walletconfig["networks"]:
-      logging.debug(network)
-      networkname=network["name"]
-      self.metrics[networkname]={}
-      for wallet in network["wallets"]:
-        metric = Gauge(f"{wallet['address']}", 
-                        f"{wallet['name']}")
-        self.metrics[networkname][wallet['address']]=metric
 
   def run_metrics_loop(self):
     """Metrics fetching loop"""
@@ -59,7 +53,8 @@ class AppMetrics:
                   wallet['address'], 
                   network['denom'])) / (10 ** network['decimals'])
           self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
-          self.metrics[networkname][wallet['address']].set(balance)
+          
+          self.account_balance.labels(network=networkname, address=wallet['address'],name=wallet['name']).set(balance)
     except Exception as e:
       self.logging.error(str(e))
 
