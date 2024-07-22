@@ -27,7 +27,7 @@ class AppMetrics:
     self.account_balance = Gauge("account_balance", "account balance", ["address", "name", "network"])
     self.rpc_call_status_counter = Counter(
       "rpc_call_status",
-      "Count the number of success or failed update for a given url",
+      "Count the number of success or failed http call for a given url",
       ["url", "status"],
     )
 
