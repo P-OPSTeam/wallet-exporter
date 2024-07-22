@@ -2,7 +2,7 @@
 
 import os
 import time
-from prometheus_client import start_http_server, Gauge, Enum
+from prometheus_client import start_http_server, Gauge, Counter
 from datetime import datetime
 import argparse
 from dotenv import load_dotenv
@@ -25,6 +25,11 @@ class AppMetrics:
 
     # all metrics are defined below
     self.account_balance = Gauge("account_balance", "account balance", ["address", "name", "network"])
+    self.rpc_call_status_counter = Counter(
+      "rpc_call_status",
+      "Count the number of success or failed http call for a given url",
+      ["url", "status"],
+    )
 
     logging.debug(walletconfig)
 
@@ -43,20 +48,20 @@ class AppMetrics:
 
     self.logging.info("Fetching wallet balances")
 
-    try:
-      for network in self.walletconfig["networks"]:
-        self.logging.debug(network)
-        networkname=network["name"]
-        for wallet in network["wallets"]:
+    for network in self.walletconfig["networks"]:
+      self.logging.debug(network)
+      networkname=network["name"]
+      for wallet in network["wallets"]:
+        try:
           self.logging.info(f"Fetching {wallet['address']}")
           balance=float(get_maincoin_balance(network["api"], 
                   wallet['address'], 
-                  network['denom'])) / (10 ** network['decimals'])
+                  network['denom'], self.rpc_call_status_counter)) / (10 ** network['decimals'])
           self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
           
           self.account_balance.labels(network=networkname, address=wallet['address'],name=wallet['name']).set(balance)
-    except Exception as e:
-      self.logging.error(str(e))
+        except Exception as e:
+          self.logging.error(str(e))
 
 def argsparse():
   parser = argparse.ArgumentParser(description="Wallets Exporter")

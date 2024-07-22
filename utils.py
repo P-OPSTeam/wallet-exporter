@@ -4,19 +4,29 @@ import requests
 from requests.exceptions import HTTPError
 import logging
 import structlog
+from metrics_enum import MetricsUrlStatus
     
-def http_json_call(url):
+def http_json_call(url, rpc_call_status_counter):
   try:
     r = requests.get(url)
     r.raise_for_status()
   except HTTPError as http_err:
+     rpc_call_status_counter.labels(
+        url=url, status=MetricsUrlStatus.FAILED.value
+     ).inc()
      if r.content is not None:
       raise Exception(f'HTTP error occurred: {http_err}: {r.content}')  # Python 3.6
      else:
        raise Exception(f'HTTP error occurred: {http_err}')
   except Exception as err:
+    rpc_call_status_counter.labels(
+        url=url, status=MetricsUrlStatus.FAILED.value
+     ).inc()
     raise Exception(f'Other error occurred: {err}')  # Python 3.6
   else:
+    rpc_call_status_counter.labels(
+        url=url, status=MetricsUrlStatus.SUCCESS.value
+    ).inc()
     return json.loads(r.content)
 
 def read_config_file(file_path):
