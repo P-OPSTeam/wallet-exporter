@@ -6,7 +6,6 @@ def get_coins_balances(restprovider, addr: str, rpc_call_status_counter):
     try:
         d = http_json_call(
             url=f"{restprovider}/cosmos/bank/v1beta1/balances/{addr}",
-            server=restprovider,
             rpc_call_status_counter=rpc_call_status_counter,
             params={},
         )
@@ -23,7 +22,6 @@ def get_maincoin_balance(apiprovider, addr: str, maindenom, rpc_call_status_coun
     try:
         d = http_json_call(
             url=f"{apiprovider}/cosmos/bank/v1beta1/balances/{addr}",
-            server=apiprovider,
             rpc_call_status_counter=rpc_call_status_counter,
             params={},
         )
@@ -43,7 +41,6 @@ def get_delegations(apiprovider, addr: str, maindenom, rpc_call_status_counter):
         while True:
             d = http_json_call(
                 url=f"{apiprovider}/cosmos/staking/v1beta1/delegations/{addr}",
-                server=apiprovider,
                 rpc_call_status_counter=rpc_call_status_counter,
                 params=params,
             )
@@ -71,7 +68,6 @@ def get_unbonding_delegations(apiprovider, addr: str, rpc_call_status_counter):
         while True:
             d = http_json_call(
                 url=f"{apiprovider}/cosmos/staking/v1beta1/delegators/{addr}/unbonding_delegations",
-                server=apiprovider,
                 rpc_call_status_counter=rpc_call_status_counter,
                 params=params,
             )
@@ -97,7 +93,6 @@ def get_rewards(apiprovider, addr: str, maindenom, rpc_call_status_counter):
         params: dict = {}
         d = http_json_call(
             url=f"{apiprovider}/cosmos/distribution/v1beta1/delegators/{addr}/rewards",
-            server=apiprovider,
             rpc_call_status_counter=rpc_call_status_counter,
             params=params,
         )

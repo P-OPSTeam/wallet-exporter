@@ -12,7 +12,8 @@ from cosmos import (
     get_unbonding_delegations,
     get_rewards,
 )
-from metrics_enum import MetricsAccountInfo
+from metrics_enum import MetricsAccountInfo, NetworkType
+from ethereum import get_ethereum_balance, get_erc20_balance
 
 
 class AppMetrics:
@@ -49,6 +50,107 @@ class AppMetrics:
             self.fetch()
             time.sleep(self.polling_interval_seconds)
 
+    def fetch_balance(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+        balance = 0
+
+        if network_type == NetworkType.COSMOS.value:
+            balance = float(
+                get_maincoin_balance(
+                    network["api"],
+                    wallet["address"],
+                    network["denom"],
+                    self.rpc_call_status_counter,
+                )
+            ) / (10 ** network["decimals"])
+        elif network_type == NetworkType.ETHEREUM.value:
+            balance = get_ethereum_balance(
+                apiprovider=network["api"],
+                addr=wallet["address"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+        elif network_type == NetworkType.ERC_20.value:
+            balance = get_erc20_balance(
+                apiprovider=network["api"],
+                addr=wallet["address"],
+                contract_address=network["contract_addess"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+
+        self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
+
+        self.account_info.labels(
+            network=network_name,
+            address=wallet["address"],
+            name=wallet["name"],
+            type=MetricsAccountInfo.BALANCE.value,
+        ).set(balance)
+
+    def fetch_delegations(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.COSMOS.value:
+            delegations = float(
+                get_delegations(
+                    network["api"],
+                    wallet["address"],
+                    network["denom"],
+                    self.rpc_call_status_counter,
+                )
+            ) / (10 ** network["decimals"])
+            self.logging.info(f"{wallet['address']} has {delegations} delegations")
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.DELEGATIONS.value,
+            ).set(delegations)
+
+    def fetch_unbounding_delegations(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.COSMOS.value:
+            unbounding_delegations = float(
+                get_unbonding_delegations(
+                    network["api"],
+                    wallet["address"],
+                    self.rpc_call_status_counter,
+                )
+            ) / (10 ** network["decimals"])
+            self.logging.info(
+                f"{wallet['address']} has {unbounding_delegations} unbounding delegations"
+            )
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.UNBOUNDING_DELEGATIONS.value,
+            ).set(unbounding_delegations)
+
+    def fetch_rewards(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.COSMOS.value:
+            rewards = float(
+                get_rewards(
+                    network["api"],
+                    wallet["address"],
+                    network["denom"],
+                    self.rpc_call_status_counter,
+                )
+            ) / (10 ** network["decimals"])
+            self.logging.info(f"{wallet['address']} has {rewards} rewards")
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.REWARDS.value,
+            ).set(rewards)
+
     def fetch(self):
         """
         Get metrics from application and refresh Prometheus metrics with
@@ -59,79 +161,14 @@ class AppMetrics:
 
         for network in self.walletconfig["networks"]:
             self.logging.debug(network)
-            networkname = network["name"]
             for wallet in network["wallets"]:
                 try:
                     self.logging.info(f"Fetching {wallet['address']}")
-                    balance = float(
-                        get_maincoin_balance(
-                            network["api"],
-                            wallet["address"],
-                            network["denom"],
-                            self.rpc_call_status_counter,
-                        )
-                    ) / (10 ** network["decimals"])
-                    self.logging.info(
-                        f"{wallet['address']} has {balance} {network['symbol']}"
-                    )
-
-                    self.account_info.labels(
-                        network=networkname,
-                        address=wallet["address"],
-                        name=wallet["name"],
-                        type=MetricsAccountInfo.BALANCE.value,
-                    ).set(balance)
-
-                    delegations = float(
-                        get_delegations(
-                            network["api"],
-                            wallet["address"],
-                            network["denom"],
-                            self.rpc_call_status_counter,
-                        )
-                    ) / (10 ** network["decimals"])
-                    self.logging.info(
-                        f"{wallet['address']} has {delegations} delegations"
-                    )
-                    self.account_info.labels(
-                        network=networkname,
-                        address=wallet["address"],
-                        name=wallet["name"],
-                        type=MetricsAccountInfo.DELEGATIONS.value,
-                    ).set(delegations)
-
-                    unbounding_delegations = float(
-                        get_unbonding_delegations(
-                            network["api"],
-                            wallet["address"],
-                            self.rpc_call_status_counter,
-                        )
-                    ) / (10 ** network["decimals"])
-                    self.logging.info(
-                        f"{wallet['address']} has {unbounding_delegations} unbounding delegations"
-                    )
-                    self.account_info.labels(
-                        network=networkname,
-                        address=wallet["address"],
-                        name=wallet["name"],
-                        type=MetricsAccountInfo.UNBOUNDING_DELEGATIONS.value,
-                    ).set(unbounding_delegations)
-
-                    rewards = float(
-                        get_rewards(
-                            network["api"],
-                            wallet["address"],
-                            network["denom"],
-                            self.rpc_call_status_counter,
-                        )
-                    ) / (10 ** network["decimals"])
-                    self.logging.info(f"{wallet['address']} has {rewards} rewards")
-                    self.account_info.labels(
-                        network=networkname,
-                        address=wallet["address"],
-                        name=wallet["name"],
-                        type=MetricsAccountInfo.REWARDS.value,
-                    ).set(rewards)
+                    self.fetch_balance(network=network, wallet=wallet)
+                    self.fetch_delegations(network=network, wallet=wallet)
+                    self.fetch_unbounding_delegations(network=network, wallet=wallet)
+                    self.fetch_rewards(network=network, wallet=wallet)
+                    
                 except Exception as e:
                     self.logging.error(str(e))
 
