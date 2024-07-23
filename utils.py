@@ -1,13 +1,18 @@
 import json
-import yaml
-import requests
-from requests.exceptions import HTTPError
 import logging
+from urllib.parse import urlparse
+
+import requests
 import structlog
+import yaml
+from requests.exceptions import HTTPError
+
 from metrics_enum import MetricsUrlStatus
 
 
-def http_json_call(url, params, server, rpc_call_status_counter):
+def http_json_call(url, params, rpc_call_status_counter):
+    parsed_url = urlparse(url)
+    server = f"{parsed_url.scheme}://{parsed_url.netloc}"
     try:
         r = requests.get(url, params=params)
         r.raise_for_status()
@@ -58,10 +63,6 @@ def read_config_file(file_path):
             return f'Error: no "rpc" in {network["name"]}', False
         if "api" not in network:
             return f'Error: no "api" in {network["name"]}', False
-        if "decimals" not in network:
-            return f'Error: no "decimals" in {network["name"]}', False
-        if "denom" not in network:
-            return f'Error: no "denom" in {network["name"]}', False
         if "symbol" not in network:
             return f'Error: no "symbols" in {network["name"]}', False
         if "type" not in network:

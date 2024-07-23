@@ -50,6 +50,7 @@ account_info{address="cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew",name="dele
 ```
 # TODO
 
-- [] support for ETH and ERC20 token
+- [X] support for cosmos staking (delegated token, undelegated, Staking Reward)
+- [X] support for ETH and ERC20 token
 - [] support other chain (DOT, AVAX, ...)
 - [] create grafana dashboard
