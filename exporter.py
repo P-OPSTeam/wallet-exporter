@@ -74,7 +74,7 @@ class AppMetrics:
             balance = get_erc20_balance(
                 apiprovider=network["api"],
                 addr=wallet["address"],
-                contract_address=network["contract_addess"],
+                contract_address=network["contract_address"],
                 rpc_call_status_counter=self.rpc_call_status_counter,
             )
 
