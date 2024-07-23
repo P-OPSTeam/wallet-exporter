@@ -64,21 +64,17 @@ class AppMetrics:
                     self.rpc_call_status_counter,
                 )
             ) / (10 ** network["decimals"])
+            self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
         elif network_type == NetworkType.ETHEREUM.value:
             balance = get_ethereum_balance(
                 apiprovider=network["api"],
-                addr=wallet["address"],
+                wallet=wallet,
                 rpc_call_status_counter=self.rpc_call_status_counter,
             )
-        elif network_type == NetworkType.ERC_20.value:
-            balance = get_erc20_balance(
-                apiprovider=network["api"],
-                addr=wallet["address"],
-                contract_address=network["contract_address"],
-                rpc_call_status_counter=self.rpc_call_status_counter,
-            )
-
-        self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
+            if "contract_address" in wallet:
+                self.logging.info(f"{wallet['address']} has {balance} {wallet['symbol']}")
+            else:
+                self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
 
         self.account_info.labels(
             network=network_name,
