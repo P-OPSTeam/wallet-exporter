@@ -45,12 +45,11 @@ sudo systemctl start wallet-exporter
 ```
 curl -s localhost:9877/metric
 
-account_balance{address="cosmos1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj",name="validator",network="cosmos"} 54.451031
-account_balance{address="cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew",name="delegator",network="cosmos"} 25600.995009
+account_info{address="cosmos1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj",name="validator",network="cosmos", type="balance"} 54.451031
+account_info{address="cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew",name="delegator",network="cosmos", type="balance"} 25600.995009
 ```
 # TODO
 
-- [] support for cosmos staking (delegated token, undelegated, Staking Reward)
 - [] support for ETH and ERC20 token
 - [] support other chain (DOT, AVAX, ...)
 - [] create grafana dashboard
