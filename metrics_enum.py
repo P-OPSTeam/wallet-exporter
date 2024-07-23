@@ -16,4 +16,3 @@ class MetricsAccountInfo(Enum):
 class NetworkType(Enum):
     COSMOS = "cosmos"
     ETHEREUM = "ethereum"
-    ERC_20 = "erc20"
