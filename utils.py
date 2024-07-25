@@ -63,8 +63,6 @@ def read_config_file(file_path):
             return f'Error: no "rpc" in {network["name"]}', False
         if "api" not in network:
             return f'Error: no "api" in {network["name"]}', False
-        if "symbol" not in network:
-            return f'Error: no "symbols" in {network["name"]}', False
         if "type" not in network:
             return f'Error: no "type" in {network["name"]}', False
 

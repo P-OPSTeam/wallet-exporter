@@ -1,19 +1,22 @@
 """Application exporter"""
 
+import argparse
 import os
 import time
-from prometheus_client import start_http_server, Gauge, Counter
-import argparse
+
 from dotenv import load_dotenv
-from utils import read_config_file, configure_logging
+from prometheus_client import Counter, Gauge, start_http_server
+
 from cosmos import (
-    get_maincoin_balance,
     get_delegations,
-    get_unbonding_delegations,
+    get_maincoin_balance,
     get_rewards,
+    get_unbonding_delegations,
 )
+from ethereum import get_ethereum_balance
 from metrics_enum import MetricsAccountInfo, NetworkType
-from ethereum import get_ethereum_balance, get_erc20_balance
+from substrate import get_substrate_account_balance
+from utils import configure_logging, read_config_file
 
 
 class AppMetrics:
@@ -65,16 +68,31 @@ class AppMetrics:
                 )
             ) / (10 ** network["decimals"])
             self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
-        elif network_type == NetworkType.ETHEREUM.value:
+        elif network_type == NetworkType.EVM.value:
             balance = get_ethereum_balance(
                 apiprovider=network["api"],
                 wallet=wallet,
                 rpc_call_status_counter=self.rpc_call_status_counter,
             )
             if "contract_address" in wallet:
-                self.logging.info(f"{wallet['address']} has {balance} {wallet['symbol']}")
+                self.logging.info(
+                    f"{wallet['address']} has {balance} {wallet['symbol']}"
+                )
             else:
-                self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
+                self.logging.info(
+                    f"{wallet['address']} has {balance} {network['symbol']}"
+                )
+        elif network_type == NetworkType.SUBSTRATE.value:
+            substrate_info = get_substrate_account_balance(
+                node_url=network["api"],
+                address=wallet["address"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+            balance = substrate_info.get("balance") / 10 ** substrate_info.get(
+                "decimals"
+            )
+            symbol = substrate_info.get("symbol")
+            self.logging.info(f"{wallet['address']} has {balance} {symbol}")
 
         self.account_info.labels(
             network=network_name,
@@ -164,7 +182,6 @@ class AppMetrics:
                     self.fetch_delegations(network=network, wallet=wallet)
                     self.fetch_unbounding_delegations(network=network, wallet=wallet)
                     self.fetch_rewards(network=network, wallet=wallet)
-                    
                 except Exception as e:
                     self.logging.error(str(e))
 
@@ -225,7 +242,7 @@ def main():
 
     log.debug(messages)
 
-    log.debug(f"Loading .env")
+    log.debug("Loading .env")
     load_dotenv()  # take environment variables from .env
     polling_interval_seconds = int(os.getenv("POLLING_INTERVAL_SECONDS", "60"))
     exporter_port = int(os.getenv("EXPORTER_PORT", "9877"))

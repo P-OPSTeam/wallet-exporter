@@ -4,3 +4,5 @@ python-dotenv
 pyyaml
 structlog
 web3
+polkadot
+substrate-interface
