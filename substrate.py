@@ -12,7 +12,7 @@ def get_substrate_account_balance(node_url, address, rpc_call_status_counter):
         result = substrate.query(
             module="System", storage_function="Account", params=[address]
         )
-        balance_info = result.value["data"]["free"] + result.value["data"]["reserved"]
+        balance_info = result.value["data"]["free"]
 
         rpc_call_status_counter.labels(
             url=node_url, status=MetricsUrlStatus.SUCCESS.value
