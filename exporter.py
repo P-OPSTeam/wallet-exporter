@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from prometheus_client import Counter, Gauge, start_http_server
 
 from cosmos import (
+    get_cosmos_registry,
     get_delegations,
     get_maincoin_balance,
     get_rewards,
@@ -53,7 +54,7 @@ class AppMetrics:
             self.fetch()
             time.sleep(self.polling_interval_seconds)
 
-    def fetch_balance(self, network, wallet):
+    def fetch_balance(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
         balance = 0
@@ -63,25 +64,25 @@ class AppMetrics:
                 get_maincoin_balance(
                     network["api"],
                     wallet["address"],
-                    network["denom"],
+                    chain_registry["denom"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
-            self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
+            ) / (10 ** chain_registry["decimals"])
+            self.logging.info(
+                f"{wallet['address']} has {balance} {chain_registry['symbol']}"
+            )
         elif network_type == NetworkType.EVM.value:
-            balance = get_ethereum_balance(
+            balance_data = get_ethereum_balance(
                 apiprovider=network["api"],
                 wallet=wallet,
                 rpc_call_status_counter=self.rpc_call_status_counter,
             )
+            balance = balance_data["balance"]
+            symbol = balance_data["symbol"]
             if "contract_address" in wallet:
-                self.logging.info(
-                    f"{wallet['address']} has {balance} {wallet['symbol']}"
-                )
+                self.logging.info(f"{wallet['address']} has {balance} {symbol}")
             else:
-                self.logging.info(
-                    f"{wallet['address']} has {balance} {network['symbol']}"
-                )
+                self.logging.info(f"{wallet['address']} has {balance} {symbol}")
         elif network_type == NetworkType.SUBSTRATE.value:
             substrate_info = get_substrate_account_balance(
                 node_url=network["api"],
@@ -101,7 +102,7 @@ class AppMetrics:
             type=MetricsAccountInfo.BALANCE.value,
         ).set(balance)
 
-    def fetch_delegations(self, network, wallet):
+    def fetch_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
 
@@ -110,10 +111,10 @@ class AppMetrics:
                 get_delegations(
                     network["api"],
                     wallet["address"],
-                    network["denom"],
+                    chain_registry["denom"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
+            ) / (10 ** chain_registry["decimals"])
             self.logging.info(f"{wallet['address']} has {delegations} delegations")
             self.account_info.labels(
                 network=network_name,
@@ -122,7 +123,7 @@ class AppMetrics:
                 type=MetricsAccountInfo.DELEGATIONS.value,
             ).set(delegations)
 
-    def fetch_unbounding_delegations(self, network, wallet):
+    def fetch_unbounding_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
 
@@ -133,7 +134,7 @@ class AppMetrics:
                     wallet["address"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
+            ) / (10 ** chain_registry["decimals"])
             self.logging.info(
                 f"{wallet['address']} has {unbounding_delegations} unbounding delegations"
             )
@@ -144,7 +145,7 @@ class AppMetrics:
                 type=MetricsAccountInfo.UNBOUNDING_DELEGATIONS.value,
             ).set(unbounding_delegations)
 
-    def fetch_rewards(self, network, wallet):
+    def fetch_rewards(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
 
@@ -153,10 +154,10 @@ class AppMetrics:
                 get_rewards(
                     network["api"],
                     wallet["address"],
-                    network["denom"],
+                    chain_registry["denom"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
+            ) / (10 ** chain_registry["decimals"])
             self.logging.info(f"{wallet['address']} has {rewards} rewards")
             self.account_info.labels(
                 network=network_name,
@@ -173,15 +174,44 @@ class AppMetrics:
 
         self.logging.info("Fetching wallet balances")
 
+        # fetch cosmos registry
+        cosmos_registry = None
+        try:
+            cosmos_registry = get_cosmos_registry(self.rpc_call_status_counter)
+        except Exception as e:
+            self.logging.error(str(e))
+            return
+
         for network in self.walletconfig["networks"]:
             self.logging.debug(network)
+
+            chain_registry = None
+            if network["type"] == NetworkType.COSMOS.value:
+                for chain in cosmos_registry:
+                    if chain["name"] == network["name"]:
+                        chain_registry = chain
+                        break
+                if chain_registry is None:
+                    self.logging.error(
+                        f"Cannot find chain {network} in cosmos registry"
+                    )
+                    continue
+
             for wallet in network["wallets"]:
                 try:
                     self.logging.info(f"Fetching {wallet['address']}")
-                    self.fetch_balance(network=network, wallet=wallet)
-                    self.fetch_delegations(network=network, wallet=wallet)
-                    self.fetch_unbounding_delegations(network=network, wallet=wallet)
-                    self.fetch_rewards(network=network, wallet=wallet)
+                    self.fetch_balance(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_delegations(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_unbounding_delegations(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_rewards(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
                 except Exception as e:
                     self.logging.error(str(e))
 
