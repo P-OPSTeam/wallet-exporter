@@ -26,6 +26,8 @@ For cosmos wallets (celestia for example), the name of the network must match wh
 
 For evm wallets, if it is an erc20 token, you need to specify the contract address in the field contract_address in the wallet.
 
+Replace the api, rpc accordingly (for example, use https://moonbeam.public.blastapi.io if you use the moonbeam evm)
+
 ## Run it
 
 ```

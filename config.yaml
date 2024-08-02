@@ -18,6 +18,13 @@ networks:
   - name: broadcaster matic
     address: "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe9"
     contract_address: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+- name: moonbeam
+  rpc: http://127.0.0.1:26657
+  api: http://127.0.0.1:1317
+  type: evm
+  wallets:
+  - name: broadcaster moonbeam
+    address: "0xDd4273d24eAe0141F47061b08c5c73668C975A25"
 - name: polkadot
   rpc: wss://127.0.0.1:26657
   api: wss://127.0.0.1:1317

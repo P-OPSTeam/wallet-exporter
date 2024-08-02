@@ -14,7 +14,7 @@ from cosmos import (
     get_rewards,
     get_unbonding_delegations,
 )
-from ethereum import get_ethereum_balance
+from ethereum import get_evm_chains_data, get_ethereum_balance
 from metrics_enum import MetricsAccountInfo, NetworkType
 from substrate import get_substrate_account_balance
 from utils import configure_logging, read_config_file
@@ -44,6 +44,8 @@ class AppMetrics:
             "Count the number of success or failed http call for a given url",
             ["url", "status"],
         )
+        self.cosmos_registry = get_cosmos_registry(self.rpc_call_status_counter)
+        self.chains_evm = get_evm_chains_data(self.rpc_call_status_counter)
 
         logging.debug(walletconfig)
 
@@ -76,6 +78,7 @@ class AppMetrics:
                 apiprovider=network["api"],
                 wallet=wallet,
                 rpc_call_status_counter=self.rpc_call_status_counter,
+                chains_evm=self.chains_evm,
             )
             balance = balance_data["balance"]
             symbol = balance_data["symbol"]
@@ -174,20 +177,12 @@ class AppMetrics:
 
         self.logging.info("Fetching wallet balances")
 
-        # fetch cosmos registry
-        cosmos_registry = None
-        try:
-            cosmos_registry = get_cosmos_registry(self.rpc_call_status_counter)
-        except Exception as e:
-            self.logging.error(str(e))
-            return
-
         for network in self.walletconfig["networks"]:
             self.logging.debug(network)
 
             chain_registry = None
             if network["type"] == NetworkType.COSMOS.value:
-                for chain in cosmos_registry:
+                for chain in self.cosmos_registry:
                     if chain["name"] == network["name"]:
                         chain_registry = chain
                         break

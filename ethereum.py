@@ -1,9 +1,29 @@
 from web3 import Web3
+from utils import http_json_call
 
 from metrics_enum import MetricsUrlStatus
 
 
-def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter):
+def get_evm_chains_data(rpc_call_status_counter):
+    try:
+        d = http_json_call(
+            url="https://chainid.network/chains.json",
+            rpc_call_status_counter=rpc_call_status_counter,
+            params={},
+        )
+        return d
+    except Exception as err:
+        raise err
+
+
+def get_chain_symbol(chain_id, chain_data):
+    for chain in chain_data:
+        if chain["chainId"] == chain_id:
+            return chain["nativeCurrency"]["symbol"]
+    return "Unknown"
+
+
+def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_evm):
     try:
         addr = wallet["address"]
         # if it is erc20
@@ -23,10 +43,12 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter):
             web3 = Web3(Web3.HTTPProvider(apiprovider))
             balance = web3.eth.get_balance(addr)
             balance_ether = web3.from_wei(balance, "ether")
+            chain_id = web3.eth.chain_id
+            symbol = get_chain_symbol(chain_id=chain_id, chain_data=chains_evm)
             rpc_call_status_counter.labels(
                 url=apiprovider, status=MetricsUrlStatus.SUCCESS.value
             ).inc()
-            return {"balance": balance_ether, "symbol": "ETH"}
+            return {"balance": balance_ether, "symbol": symbol}
     except Exception as addr_balancer_err:
         rpc_call_status_counter.labels(
             url=apiprovider, status=MetricsUrlStatus.FAILED.value
