@@ -1,19 +1,23 @@
 """Application exporter"""
 
+import argparse
 import os
 import time
-from prometheus_client import start_http_server, Gauge, Counter
-import argparse
+
 from dotenv import load_dotenv
-from utils import read_config_file, configure_logging
+from prometheus_client import Counter, Gauge, start_http_server
+
 from cosmos import (
-    get_maincoin_balance,
+    get_cosmos_registry,
     get_delegations,
-    get_unbonding_delegations,
+    get_maincoin_balance,
     get_rewards,
+    get_unbonding_delegations,
 )
+from ethereum import get_evm_chains_data, get_ethereum_balance
 from metrics_enum import MetricsAccountInfo, NetworkType
-from ethereum import get_ethereum_balance, get_erc20_balance
+from substrate import get_substrate_account_balance
+from utils import configure_logging, read_config_file
 
 
 class AppMetrics:
@@ -40,6 +44,8 @@ class AppMetrics:
             "Count the number of success or failed http call for a given url",
             ["url", "status"],
         )
+        self.cosmos_registry = get_cosmos_registry(self.rpc_call_status_counter)
+        self.chains_evm = get_evm_chains_data(self.rpc_call_status_counter)
 
         logging.debug(walletconfig)
 
@@ -50,7 +56,7 @@ class AppMetrics:
             self.fetch()
             time.sleep(self.polling_interval_seconds)
 
-    def fetch_balance(self, network, wallet):
+    def fetch_balance(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
         balance = 0
@@ -60,21 +66,37 @@ class AppMetrics:
                 get_maincoin_balance(
                     network["api"],
                     wallet["address"],
-                    network["denom"],
+                    chain_registry["denom"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
-            self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
-        elif network_type == NetworkType.ETHEREUM.value:
-            balance = get_ethereum_balance(
+            ) / (10 ** chain_registry["decimals"])
+            self.logging.info(
+                f"{wallet['address']} has {balance} {chain_registry['symbol']}"
+            )
+        elif network_type == NetworkType.EVM.value:
+            balance_data = get_ethereum_balance(
                 apiprovider=network["api"],
                 wallet=wallet,
                 rpc_call_status_counter=self.rpc_call_status_counter,
+                chains_evm=self.chains_evm,
             )
+            balance = balance_data["balance"]
+            symbol = balance_data["symbol"]
             if "contract_address" in wallet:
-                self.logging.info(f"{wallet['address']} has {balance} {wallet['symbol']}")
+                self.logging.info(f"{wallet['address']} has {balance} {symbol}")
             else:
-                self.logging.info(f"{wallet['address']} has {balance} {network['symbol']}")
+                self.logging.info(f"{wallet['address']} has {balance} {symbol}")
+        elif network_type == NetworkType.SUBSTRATE.value:
+            substrate_info = get_substrate_account_balance(
+                node_url=network["api"],
+                address=wallet["address"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+            balance = substrate_info.get("balance") / 10 ** substrate_info.get(
+                "decimals"
+            )
+            symbol = substrate_info.get("symbol")
+            self.logging.info(f"{wallet['address']} has {balance} {symbol}")
 
         self.account_info.labels(
             network=network_name,
@@ -83,7 +105,7 @@ class AppMetrics:
             type=MetricsAccountInfo.BALANCE.value,
         ).set(balance)
 
-    def fetch_delegations(self, network, wallet):
+    def fetch_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
 
@@ -92,10 +114,10 @@ class AppMetrics:
                 get_delegations(
                     network["api"],
                     wallet["address"],
-                    network["denom"],
+                    chain_registry["denom"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
+            ) / (10 ** chain_registry["decimals"])
             self.logging.info(f"{wallet['address']} has {delegations} delegations")
             self.account_info.labels(
                 network=network_name,
@@ -104,7 +126,7 @@ class AppMetrics:
                 type=MetricsAccountInfo.DELEGATIONS.value,
             ).set(delegations)
 
-    def fetch_unbounding_delegations(self, network, wallet):
+    def fetch_unbounding_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
 
@@ -115,7 +137,7 @@ class AppMetrics:
                     wallet["address"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
+            ) / (10 ** chain_registry["decimals"])
             self.logging.info(
                 f"{wallet['address']} has {unbounding_delegations} unbounding delegations"
             )
@@ -126,7 +148,7 @@ class AppMetrics:
                 type=MetricsAccountInfo.UNBOUNDING_DELEGATIONS.value,
             ).set(unbounding_delegations)
 
-    def fetch_rewards(self, network, wallet):
+    def fetch_rewards(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
 
@@ -135,10 +157,10 @@ class AppMetrics:
                 get_rewards(
                     network["api"],
                     wallet["address"],
-                    network["denom"],
+                    chain_registry["denom"],
                     self.rpc_call_status_counter,
                 )
-            ) / (10 ** network["decimals"])
+            ) / (10 ** chain_registry["decimals"])
             self.logging.info(f"{wallet['address']} has {rewards} rewards")
             self.account_info.labels(
                 network=network_name,
@@ -157,14 +179,34 @@ class AppMetrics:
 
         for network in self.walletconfig["networks"]:
             self.logging.debug(network)
+
+            chain_registry = None
+            if network["type"] == NetworkType.COSMOS.value:
+                for chain in self.cosmos_registry:
+                    if chain["name"] == network["name"]:
+                        chain_registry = chain
+                        break
+                if chain_registry is None:
+                    self.logging.error(
+                        f"Cannot find chain {network} in cosmos registry"
+                    )
+                    continue
+
             for wallet in network["wallets"]:
                 try:
                     self.logging.info(f"Fetching {wallet['address']}")
-                    self.fetch_balance(network=network, wallet=wallet)
-                    self.fetch_delegations(network=network, wallet=wallet)
-                    self.fetch_unbounding_delegations(network=network, wallet=wallet)
-                    self.fetch_rewards(network=network, wallet=wallet)
-                    
+                    self.fetch_balance(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_delegations(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_unbounding_delegations(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_rewards(
+                        network=network, wallet=wallet, chain_registry=chain_registry
+                    )
                 except Exception as e:
                     self.logging.error(str(e))
 
@@ -225,7 +267,7 @@ def main():
 
     log.debug(messages)
 
-    log.debug(f"Loading .env")
+    log.debug("Loading .env")
     load_dotenv()  # take environment variables from .env
     polling_interval_seconds = int(os.getenv("POLLING_INTERVAL_SECONDS", "60"))
     exporter_port = int(os.getenv("EXPORTER_PORT", "9877"))

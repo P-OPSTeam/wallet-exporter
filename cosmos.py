@@ -103,3 +103,17 @@ def get_rewards(apiprovider, addr: str, maindenom, rpc_call_status_counter):
         return 0
     except Exception as addr_balancer_err:
         raise addr_balancer_err
+
+
+def get_cosmos_registry(rpc_call_status_counter):
+    try:
+        params: dict = {}
+        d = http_json_call(
+            url="https://chains.cosmos.directory",
+            rpc_call_status_counter=rpc_call_status_counter,
+            params=params,
+        )
+
+        return d["chains"]
+    except Exception as err:
+        raise err
