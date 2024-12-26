@@ -22,11 +22,11 @@ pip install -r requirements.txt
 
 Supported types of wallet: cosmos, evm, substrate (polkadot for example)
 
-For cosmos wallets (celestia for example), the name of the network must match what is in https://chains.cosmos.directory
+For cosmos wallets (celestia for example), the name of the network must match what is in ```https://chains.cosmos.directory```
 
 For evm wallets, if it is an erc20 token, you need to specify the contract address in the field contract_address in the wallet.
 
-Replace the 'api', 'rpc' accordingly (for example, use https://moonbeam.public.blastapi.io if you use the moonbeam evm)
+Replace the 'api', 'rpc' accordingly (for example, use ```https://moonbeam.public.blastapi.io``` if you use the moonbeam evm)
 
 For berachain wallet, you need to specify the bgt token contract address (see config.yaml as example).
 

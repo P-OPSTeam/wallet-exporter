@@ -4,9 +4,7 @@ import argparse
 import os
 import time
 
-from dotenv import load_dotenv
-from prometheus_client import Counter, Gauge, start_http_server
-
+from bera import get_bera_boosts, get_bera_boostees, get_bera_unboosted
 from cosmos import (
     get_cosmos_registry,
     get_delegations,
@@ -14,9 +12,10 @@ from cosmos import (
     get_rewards,
     get_unbonding_delegations,
 )
-from bera import get_bera_boosts, get_bera_boostees, get_bera_unboosted
+from dotenv import load_dotenv
 from ethereum import get_evm_chains_data, get_ethereum_balance
 from metrics_enum import MetricsAccountInfo, NetworkType
+from prometheus_client import Counter, Gauge, start_http_server
 from substrate import get_substrate_account_balance
 from utils import configure_logging, read_config_file
 
