@@ -32,4 +32,11 @@ networks:
   wallets:
   - name: broadcaster polkadot
     address: "1FwzEXsZedfWFPGtJ3Ex8SFLhvugrA9aJN9GL1GeHpYeqf7"
-  
+- name: berachain
+  rpc: https://bartio.rpc.berachain.com
+  api: https://bartio.rpc.berachain.com
+  bgt_address: "0xbDa130737BDd9618301681329bF2e46A016ff9Ad"
+  type: bera
+  wallets:
+  - name: bera validator
+    address: "0xDcCE0cB56b5a94bD6A5A889b324342981C3c16d4"    

@@ -28,6 +28,8 @@ For evm wallets, if it is an erc20 token, you need to specify the contract addre
 
 Replace the api, rpc accordingly (for example, use https://moonbeam.public.blastapi.io if you use the moonbeam evm)
 
+For berachain wallet, you need to specify the bgt token contract address (see config.yaml as example).
+
 ## Run it
 
 ```

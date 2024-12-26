@@ -14,6 +14,7 @@ from cosmos import (
     get_rewards,
     get_unbonding_delegations,
 )
+from bera import get_bera_boosts, get_bera_boostees, get_bera_unboosted
 from ethereum import get_evm_chains_data, get_ethereum_balance
 from metrics_enum import MetricsAccountInfo, NetworkType
 from substrate import get_substrate_account_balance
@@ -97,6 +98,19 @@ class AppMetrics:
             )
             symbol = substrate_info.get("symbol")
             self.logging.info(f"{wallet['address']} has {balance} {symbol}")
+        elif network_type == NetworkType.BERA.value:
+            bera_delegations = get_bera_boosts(
+                bgt_address=network["bgt_address"],
+                wallet=wallet['address'],
+                api=network["api"]
+            ) / 10 ** 18
+            bera_unboosted = get_bera_unboosted(
+                bgt_address=network["bgt_address"],
+                wallet=wallet['address'],
+                api=network["api"]
+            ) / 10 ** 18
+            balance = bera_delegations + bera_unboosted
+            self.logging.info(f"{wallet['address']} has {balance} BGT")
 
         self.account_info.labels(
             network=network_name,
@@ -125,6 +139,19 @@ class AppMetrics:
                 name=wallet["name"],
                 type=MetricsAccountInfo.DELEGATIONS.value,
             ).set(delegations)
+        elif network_type == NetworkType.BERA.value:
+            bera_delegations = get_bera_boosts(
+                bgt_address=network["bgt_address"],
+                wallet=wallet['address'],
+                api=network["api"]
+            ) / 10 ** 18
+            self.logging.info(f"{wallet['address']} has {bera_delegations} bera delegations")
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.DELEGATIONS.value,
+            ).set(bera_delegations)
 
     def fetch_unbounding_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
@@ -169,6 +196,47 @@ class AppMetrics:
                 type=MetricsAccountInfo.REWARDS.value,
             ).set(rewards)
 
+    def fetch_boostees(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.BERA.value:
+            bera_boostees = get_bera_boostees(
+                bgt_address=network["bgt_address"],
+                wallet=wallet['address'],
+                api=network["api"]
+            ) / 10 ** 18
+            self.logging.info(
+                f"{wallet['address']} has {bera_boostees} bera attributed to the validator for boosts"
+            )
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.BOOSTEES.value,
+            ).set(bera_boostees)
+
+    def fetch_unboosted(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.BERA.value:
+            bera_unboosted = get_bera_unboosted(
+                bgt_address=network["bgt_address"],
+                wallet=wallet['address'],
+                api=network["api"]
+            ) / 10 ** 18
+            self.logging.info(
+                f"{wallet['address']} has {bera_unboosted} bera unboosted"
+            )
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.UNBOOSTED.value,
+            ).set(bera_unboosted)
+
+
     def fetch(self):
         """
         Get metrics from application and refresh Prometheus metrics with
@@ -206,6 +274,12 @@ class AppMetrics:
                     )
                     self.fetch_rewards(
                         network=network, wallet=wallet, chain_registry=chain_registry
+                    )
+                    self.fetch_boostees(
+                        network=network, wallet=wallet
+                    )
+                    self.fetch_unboosted(
+                        network=network, wallet=wallet
                     )
                 except Exception as e:
                     self.logging.error(str(e))
