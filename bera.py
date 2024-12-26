@@ -12,18 +12,18 @@ def create_contract(address, abi, api):
 
 
 def get_bera_boosts(bgt_address, wallet, api):
-    bgt = create_contract(bgt_address, './abi/BGT.json', api)
+    bgt = create_contract(bgt_address, "./abi/BGT.json", api)
     result = bgt.functions.boosts(wallet).call()
     return result
 
 
 def get_bera_boostees(bgt_address, wallet, api):
-    bgt = create_contract(bgt_address, './abi/BGT.json', api)
+    bgt = create_contract(bgt_address, "./abi/BGT.json", api)
     result = bgt.functions.boostees(wallet).call()
     return result
 
 
 def get_bera_unboosted(bgt_address, wallet, api):
-    bgt = create_contract(bgt_address, './abi/BGT.json', api)
+    bgt = create_contract(bgt_address, "./abi/BGT.json", api)
     result = bgt.functions.unboostedBalanceOf(wallet).call()
     return result
