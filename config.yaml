@@ -1,43 +1,44 @@
 ---
+
 networks:
-- name: cosmoshub
-  rpc: http://127.0.0.1:26657
-  api: http://127.0.0.1:1317
-  type: cosmos
-  wallets:
-  - name: validator
-    address: cosmos1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj
-  - name: delegator
-    address: cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew
-- name: ethereum
-  rpc: http://127.0.0.1:26657
-  api: http://127.0.0.1:1317
-  type: evm
-  wallets:
-  - name: broadcaster ethereum
-    address: "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe9"
-  - name: broadcaster matic
-    address: "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe9"
-    contract_address: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
-- name: moonbeam
-  rpc: http://127.0.0.1:26657
-  api: http://127.0.0.1:1317
-  type: evm
-  wallets:
-  - name: broadcaster moonbeam
-    address: "0xDd4273d24eAe0141F47061b08c5c73668C975A25"
-- name: polkadot
-  rpc: wss://127.0.0.1:26657
-  api: wss://127.0.0.1:1317
-  type: substrate
-  wallets:
-  - name: broadcaster polkadot
-    address: "1FwzEXsZedfWFPGtJ3Ex8SFLhvugrA9aJN9GL1GeHpYeqf7"
-- name: berachain
-  rpc: https://bartio.rpc.berachain.com
-  api: https://bartio.rpc.berachain.com
-  bgt_address: "0xbDa130737BDd9618301681329bF2e46A016ff9Ad"
-  type: bera
-  wallets:
-  - name: bera validator
-    address: "0xDcCE0cB56b5a94bD6A5A889b324342981C3c16d4"    
+  - name: cosmoshub
+    rpc: http://127.0.0.1:26657
+    api: http://127.0.0.1:1317
+    type: cosmos
+    wallets:
+      - name: validator
+        address: cosmos1gswfh88s88s2evtsutwt8heh59jttjglhdlwtwj
+      - name: delegator
+        address: cosmos1r59ugu6w72s88s2evtsutwt8heh59jpqp9mm3ew
+  - name: ethereum
+    rpc: http://127.0.0.1:26657
+    api: http://127.0.0.1:1317
+    type: evm
+    wallets:
+      - name: broadcaster ethereum
+        address: "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe9"
+      - name: broadcaster matic
+        address: "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe9"
+        contract_address: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+  - name: moonbeam
+    rpc: http://127.0.0.1:26657
+    api: http://127.0.0.1:1317
+    type: evm
+    wallets:
+      - name: broadcaster moonbeam
+        address: "0xDd4273d24eAe0141F47061b08c5c73668C975A25"
+  - name: polkadot
+    rpc: wss://127.0.0.1:26657
+    api: wss://127.0.0.1:1317
+    type: substrate
+    wallets:
+      - name: broadcaster polkadot
+        address: "1FwzEXsZedfWFPGtJ3Ex8SFLhvugrA9aJN9GL1GeHpYeqf7"
+  - name: berachain
+    rpc: https://bartio.rpc.berachain.com
+    api: https://bartio.rpc.berachain.com
+    bgt_address: "0xbDa130737BDd9618301681329bF2e46A016ff9Ad"
+    type: bera
+    wallets:
+      - name: bera validator
+        address: "0xDcCE0cB56b5a94bD6A5A889b324342981C3c16d4"    
