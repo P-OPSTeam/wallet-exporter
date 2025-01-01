@@ -4,7 +4,13 @@ import argparse
 import os
 import time
 
-from bera import get_bera_boostees, get_bera_boosts, get_bera_unboosted
+from bera import (
+    get_bera_boostees,
+    get_bera_boosts,
+    get_bera_unboosted,
+    get_bera_queued_boost,
+    get_bera_balance
+)
 from cosmos import (
     get_cosmos_registry,
     get_delegations,
@@ -98,23 +104,14 @@ class AppMetrics:
             symbol = substrate_info.get("symbol")
             self.logging.info(f"{wallet['address']} has {balance} {symbol}")
         elif network_type == NetworkType.BERA.value:
-            bera_delegations = (
-                get_bera_boosts(
+            balance = (
+                get_bera_balance(
                     bgt_address=network["bgt_address"],
                     wallet=wallet["address"],
                     api=network["api"],
                 )
                 / 10**18
             )
-            bera_unboosted = (
-                get_bera_unboosted(
-                    bgt_address=network["bgt_address"],
-                    wallet=wallet["address"],
-                    api=network["api"],
-                )
-                / 10**18
-            )
-            balance = bera_delegations + bera_unboosted
             self.logging.info(f"{wallet['address']} has {balance} BGT")
 
         self.account_info.labels(
@@ -144,8 +141,13 @@ class AppMetrics:
                 name=wallet["name"],
                 type=MetricsAccountInfo.DELEGATIONS.value,
             ).set(delegations)
-        elif network_type == NetworkType.BERA.value:
-            bera_delegations = (
+
+    def fetch_boosts(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.BERA.value:
+            bera_boosts = (
                 get_bera_boosts(
                     bgt_address=network["bgt_address"],
                     wallet=wallet["address"],
@@ -154,14 +156,14 @@ class AppMetrics:
                 / 10**18
             )
             self.logging.info(
-                f"{wallet['address']} has {bera_delegations} bera delegations"
+                f"{wallet['address']} has {bera_boosts} bera boosts"
             )
             self.account_info.labels(
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
-                type=MetricsAccountInfo.DELEGATIONS.value,
-            ).set(bera_delegations)
+                type=MetricsAccountInfo.BOOSTS.value,
+            ).set(bera_boosts)
 
     def fetch_unbounding_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
@@ -226,7 +228,7 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
-                type=MetricsAccountInfo.BOOSTEES.value,
+                type=MetricsAccountInfo.VALIDATOR_BOOSTEES.value,
             ).set(bera_boostees)
 
     def fetch_unboosted(self, network, wallet):
@@ -251,6 +253,29 @@ class AppMetrics:
                 name=wallet["name"],
                 type=MetricsAccountInfo.UNBOOSTED.value,
             ).set(bera_unboosted)
+
+    def fetch_queued_boost(self, network, wallet):
+        network_name = network["name"]
+        network_type = network["type"]
+
+        if network_type == NetworkType.BERA.value:
+            bera_queued_boost = (
+                get_bera_queued_boost(
+                    bgt_address=network["bgt_address"],
+                    wallet=wallet["address"],
+                    api=network["api"],
+                )
+                / 10**18
+            )
+            self.logging.info(
+                f"{wallet['address']} has {bera_queued_boost} bera queued boost"
+            )
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                type=MetricsAccountInfo.QUEUED_BOOST.value,
+            ).set(bera_queued_boost)
 
     def fetch(self):
         """
@@ -290,8 +315,10 @@ class AppMetrics:
                     self.fetch_rewards(
                         network=network, wallet=wallet, chain_registry=chain_registry
                     )
+                    self.fetch_boosts(network=network, wallet=wallet)
                     self.fetch_boostees(network=network, wallet=wallet)
                     self.fetch_unboosted(network=network, wallet=wallet)
+                    self.fetch_queued_boost(network=network, wallet=wallet)
                 except Exception as e:
                     self.logging.error(str(e))
 

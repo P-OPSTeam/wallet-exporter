@@ -28,3 +28,15 @@ def get_bera_unboosted(bgt_address, wallet, api):
     bgt = create_contract(bgt_address, "./abi/BGT.json", api)
     result = bgt.functions.unboostedBalanceOf(wallet).call()
     return result
+
+
+def get_bera_queued_boost(bgt_address, wallet, api):
+    bgt = create_contract(bgt_address, "./abi/BGT.json", api)
+    result = bgt.functions.queuedBoost(wallet).call()
+    return result
+
+
+def get_bera_balance(bgt_address, wallet, api):
+    bgt = create_contract(bgt_address, "./abi/BGT.json", api)
+    result = bgt.functions.balanceOf(wallet).call()
+    return result

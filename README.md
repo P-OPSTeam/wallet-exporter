@@ -63,6 +63,30 @@ account_info{address="1FwzEXsZedfWFPGtJ3Ex8SFLhvugrA9aJN9GL1GeHpYeqf7",name="bro
 
 ```
 
+## Berachain
+
+For Berachain, there are specific metrics
+
+```bash
+Example
+curl -s localhost:9877/metric
+
+account_info{address="0x34ae6F60D246ee786a01F4941047fEbe3A4198fA",name="bera validator",network="berachain",type="balance"} 9.554170322670004
+account_info{address="0x34ae6F60D246ee786a01F4941047fEbe3A4198fA",name="bera validator",network="berachain",type="boosts"} 8.253249496763132
+account_info{address="0x34ae6F60D246ee786a01F4941047fEbe3A4198fA",name="bera validator",network="berachain",type="validator_boostees"} 0.0
+account_info{address="0x34ae6F60D246ee786a01F4941047fEbe3A4198fA",name="bera validator",network="berachain",type="unboosted"} 1.0009208259068711
+account_info{address="0x34ae6F60D246ee786a01F4941047fEbe3A4198fA",name="bera validator",network="berachain",type="queued_boost"} 0.3
+
+```
+
+The type "boosts" is the amount of BGT used by an account for boosts
+
+The type "validator_boostees" is the amount of BGT attributed to the validator for boosts
+
+The type "unboosted" is the unboosted balance of an account
+
+The type "queued_boost" is the amount of BGT queued up to be used by an account for boosts
+
 ## TODO
 
 - [X] support for cosmos staking (delegated token, undelegated, Staking Reward)
