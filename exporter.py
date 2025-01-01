@@ -5,11 +5,11 @@ import os
 import time
 
 from bera import (
+    get_bera_balance,
     get_bera_boostees,
     get_bera_boosts,
-    get_bera_unboosted,
     get_bera_queued_boost,
-    get_bera_balance
+    get_bera_unboosted,
 )
 from cosmos import (
     get_cosmos_registry,
@@ -155,9 +155,7 @@ class AppMetrics:
                 )
                 / 10**18
             )
-            self.logging.info(
-                f"{wallet['address']} has {bera_boosts} bera boosts"
-            )
+            self.logging.info(f"{wallet['address']} has {bera_boosts} bera boosts")
             self.account_info.labels(
                 network=network_name,
                 address=wallet["address"],
