@@ -1,29 +1,40 @@
 [
   {
     "type": "function",
-    "name": "CLOCK_MODE",
+    "name": "activateBoost",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "activateBoostDelay",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "string",
-        "internalType": "string"
+        "type": "uint32",
+        "internalType": "uint32"
       }
     ],
     "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "activateBoost",
-    "inputs": [
-      {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -59,7 +70,7 @@
         "internalType": "address"
       },
       {
-        "name": "amount",
+        "name": "value",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -94,19 +105,6 @@
   },
   {
     "type": "function",
-    "name": "beraChef",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IBeraChef"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "boosted",
     "inputs": [
       {
@@ -115,9 +113,9 @@
         "internalType": "address"
       },
       {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [
@@ -139,9 +137,9 @@
         "internalType": "address"
       },
       {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [
@@ -160,36 +158,12 @@
   },
   {
     "type": "function",
-    "name": "boostedRewardRate",
-    "inputs": [
-      {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "rewardRate",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "boostees",
     "inputs": [
       {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [
@@ -225,9 +199,9 @@
     "name": "cancelBoost",
     "inputs": [
       {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       },
       {
         "name": "amount",
@@ -240,100 +214,21 @@
   },
   {
     "type": "function",
-    "name": "checkpoints",
+    "name": "cancelDropBoost",
     "inputs": [
       {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       },
       {
-        "name": "pos",
-        "type": "uint32",
-        "internalType": "uint32"
+        "name": "amount",
+        "type": "uint128",
+        "internalType": "uint128"
       }
     ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct Checkpoints.Checkpoint208",
-        "components": [
-          {
-            "name": "_key",
-            "type": "uint48",
-            "internalType": "uint48"
-          },
-          {
-            "name": "_value",
-            "type": "uint208",
-            "internalType": "uint208"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "clock",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint48",
-        "internalType": "uint48"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "commissionRewardRate",
-    "inputs": [
-      {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "rewardRate",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "commissions",
-    "inputs": [
-      {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "blockNumberLast",
-        "type": "uint32",
-        "internalType": "uint32"
-      },
-      {
-        "name": "rate",
-        "type": "uint224",
-        "internalType": "uint224"
-      }
-    ],
-    "stateMutability": "view"
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -423,58 +318,63 @@
     "name": "dropBoost",
     "inputs": [
       {
-        "name": "validator",
+        "name": "user",
         "type": "address",
         "internalType": "address"
       },
       {
-        "name": "amount",
-        "type": "uint128",
-        "internalType": "uint128"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
-    "outputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "eip712Domain",
+    "name": "dropBoostDelay",
     "inputs": [],
     "outputs": [
       {
-        "name": "fields",
-        "type": "bytes1",
-        "internalType": "bytes1"
-      },
+        "name": "",
+        "type": "uint32",
+        "internalType": "uint32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "dropBoostQueue",
+    "inputs": [
       {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "version",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "chainId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "verifyingContract",
+        "name": "account",
         "type": "address",
         "internalType": "address"
       },
       {
-        "name": "salt",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "blockNumberLast",
+        "type": "uint32",
+        "internalType": "uint32"
       },
       {
-        "name": "extensions",
-        "type": "uint256[]",
-        "internalType": "uint256[]"
+        "name": "balance",
+        "type": "uint128",
+        "internalType": "uint128"
       }
     ],
     "stateMutability": "view"
@@ -543,38 +443,6 @@
   },
   {
     "type": "function",
-    "name": "initialize",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "isWhitelistedSender",
-    "inputs": [
-      {
-        "name": "sender",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "mint",
     "inputs": [
       {
@@ -615,16 +483,16 @@
         "internalType": "string"
       }
     ],
-    "stateMutability": "pure"
+    "stateMutability": "view"
   },
   {
     "type": "function",
-    "name": "nonces",
+    "name": "normalizedBoost",
     "inputs": [
       {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [
@@ -638,44 +506,30 @@
   },
   {
     "type": "function",
-    "name": "numCheckpoints",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint32",
-        "internalType": "uint32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "owner",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "queueBoost",
     "inputs": [
       {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "amount",
+        "type": "uint128",
+        "internalType": "uint128"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "queueDropBoost",
+    "inputs": [
+      {
+        "name": "pubkey",
+        "type": "bytes",
+        "internalType": "bytes"
       },
       {
         "name": "amount",
@@ -725,19 +579,12 @@
   },
   {
     "type": "function",
-    "name": "renounceOwnership",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setBeraChef",
+    "name": "setActivateBoostDelay",
     "inputs": [
       {
-        "name": "_beraChef",
-        "type": "address",
-        "internalType": "address"
+        "name": "_activateBoostDelay",
+        "type": "uint32",
+        "internalType": "uint32"
       }
     ],
     "outputs": [],
@@ -745,17 +592,12 @@
   },
   {
     "type": "function",
-    "name": "setCommission",
+    "name": "setDropBoostDelay",
     "inputs": [
       {
-        "name": "validator",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "rate",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "_dropBoostDelay",
+        "type": "uint32",
+        "internalType": "uint32"
       }
     ],
     "outputs": [],
@@ -795,7 +637,7 @@
       {
         "name": "",
         "type": "address",
-        "internalType": "contract BGTStaker"
+        "internalType": "address"
       }
     ],
     "stateMutability": "view"
@@ -811,7 +653,7 @@
         "internalType": "string"
       }
     ],
-    "stateMutability": "pure"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -849,7 +691,7 @@
         "internalType": "address"
       },
       {
-        "name": "amount",
+        "name": "value",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -878,7 +720,7 @@
         "internalType": "address"
       },
       {
-        "name": "amount",
+        "name": "value",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -890,19 +732,6 @@
         "internalType": "bool"
       }
     ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "transferOwnership",
-    "inputs": [
-      {
-        "name": "newOwner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
@@ -953,16 +782,35 @@
         "internalType": "address"
       },
       {
-        "name": "validator",
+        "name": "user",
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "pubkey",
+        "type": "bytes",
+        "indexed": true,
+        "internalType": "bytes"
       },
       {
         "name": "amount",
         "type": "uint128",
         "indexed": false,
         "internalType": "uint128"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ActivateBoostDelayChanged",
+    "inputs": [
+      {
+        "name": "newDelay",
+        "type": "uint32",
+        "indexed": false,
+        "internalType": "uint32"
       }
     ],
     "anonymous": false
@@ -994,25 +842,6 @@
   },
   {
     "type": "event",
-    "name": "BeraChefChanged",
-    "inputs": [
-      {
-        "name": "previous",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "current",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "CancelBoost",
     "inputs": [
       {
@@ -1022,10 +851,35 @@
         "internalType": "address"
       },
       {
-        "name": "validator",
+        "name": "pubkey",
+        "type": "bytes",
+        "indexed": true,
+        "internalType": "bytes"
+      },
+      {
+        "name": "amount",
+        "type": "uint128",
+        "indexed": false,
+        "internalType": "uint128"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "CancelDropBoost",
+    "inputs": [
+      {
+        "name": "user",
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "pubkey",
+        "type": "bytes",
+        "indexed": true,
+        "internalType": "bytes"
       },
       {
         "name": "amount",
@@ -1097,10 +951,10 @@
         "internalType": "address"
       },
       {
-        "name": "validator",
-        "type": "address",
+        "name": "pubkey",
+        "type": "bytes",
         "indexed": true,
-        "internalType": "address"
+        "internalType": "bytes"
       },
       {
         "name": "amount",
@@ -1113,19 +967,13 @@
   },
   {
     "type": "event",
-    "name": "EIP712DomainChanged",
-    "inputs": [],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "Initialized",
+    "name": "DropBoostDelayChanged",
     "inputs": [
       {
-        "name": "version",
-        "type": "uint64",
+        "name": "newDelay",
+        "type": "uint32",
         "indexed": false,
-        "internalType": "uint64"
+        "internalType": "uint32"
       }
     ],
     "anonymous": false
@@ -1151,25 +999,6 @@
   },
   {
     "type": "event",
-    "name": "OwnershipTransferred",
-    "inputs": [
-      {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "QueueBoost",
     "inputs": [
       {
@@ -1179,10 +1008,35 @@
         "internalType": "address"
       },
       {
-        "name": "validator",
+        "name": "pubkey",
+        "type": "bytes",
+        "indexed": true,
+        "internalType": "bytes"
+      },
+      {
+        "name": "amount",
+        "type": "uint128",
+        "indexed": false,
+        "internalType": "uint128"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "QueueDropBoost",
+    "inputs": [
+      {
+        "name": "user",
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "pubkey",
+        "type": "bytes",
+        "indexed": true,
+        "internalType": "bytes"
       },
       {
         "name": "amount",
@@ -1239,6 +1093,25 @@
   },
   {
     "type": "event",
+    "name": "StakerChanged",
+    "inputs": [
+      {
+        "name": "previous",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "current",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Transfer",
     "inputs": [
       {
@@ -1263,48 +1136,13 @@
     "anonymous": false
   },
   {
-    "type": "event",
-    "name": "UpdateCommission",
-    "inputs": [
-      {
-        "name": "validator",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "oldRate",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "newRate",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "AlreadyInitialized",
-    "inputs": []
-  },
-  {
     "type": "error",
     "name": "AmountLessThanMinIncentiveRate",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "BlockDoesNotExist",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "BlockNotInBuffer",
+    "name": "CannotRecoverIncentiveToken",
     "inputs": []
   },
   {
@@ -1319,162 +1157,27 @@
   },
   {
     "type": "error",
-    "name": "CheckpointUnorderedInsertion",
+    "name": "DepositNotMultipleOfGwei",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "DelegateStakedOverflow",
+    "name": "DepositValueTooHigh",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "ECDSAInvalidSignature",
+    "name": "DonateAmountLessThanPayoutAmount",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "ECDSAInvalidSignatureLength",
-    "inputs": [
-      {
-        "name": "length",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
+    "name": "IncentiveRateTooHigh",
+    "inputs": []
   },
   {
     "type": "error",
-    "name": "ECDSAInvalidSignatureS",
-    "inputs": [
-      {
-        "name": "s",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20ExceededSafeSupply",
-    "inputs": [
-      {
-        "name": "increasedSupply",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "cap",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20InsufficientAllowance",
-    "inputs": [
-      {
-        "name": "spender",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "allowance",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "needed",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20InsufficientBalance",
-    "inputs": [
-      {
-        "name": "sender",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "balance",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "needed",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20InvalidApprover",
-    "inputs": [
-      {
-        "name": "approver",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20InvalidReceiver",
-    "inputs": [
-      {
-        "name": "receiver",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20InvalidSender",
-    "inputs": [
-      {
-        "name": "sender",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC20InvalidSpender",
-    "inputs": [
-      {
-        "name": "spender",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC5805FutureLookup",
-    "inputs": [
-      {
-        "name": "timepoint",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "clock",
-        "type": "uint48",
-        "internalType": "uint48"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC6372InconsistentClock",
+    "name": "IndexOutOfRange",
     "inputs": []
   },
   {
@@ -1489,6 +1192,11 @@
   },
   {
     "type": "error",
+    "name": "InsufficientDeposit",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "InsufficientSelfStake",
     "inputs": []
   },
@@ -1499,33 +1207,27 @@
   },
   {
     "type": "error",
-    "name": "InvalidAccountNonce",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "currentNonce",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "InvalidCommission",
+    "name": "InvalidActivateBoostDelay",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "InvalidCuttingBoardWeights",
+    "name": "InvalidBaseRate",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "InvalidInitialization",
+    "name": "InvalidBoostMultiplier",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidCredentialsLength",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidDropBoostDelay",
     "inputs": []
   },
   {
@@ -1535,7 +1237,37 @@
   },
   {
     "type": "error",
-    "name": "InvalidMinter",
+    "name": "InvalidMinBoostedRewardRate",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidProof",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidPubKeyLength",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidRewardAllocationWeights",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidRewardConvexity",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidRewardRate",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSignatureLength",
     "inputs": []
   },
   {
@@ -1545,22 +1277,27 @@
   },
   {
     "type": "error",
+    "name": "InvalidateDefaultRewardAllocation",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "InvariantCheckFailed",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "MaxNumWeightsPerCuttingBoardIsZero",
+    "name": "MaxNumWeightsPerRewardAllocationIsZero",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "NoWhitelistedTokens",
+    "name": "MinIncentiveRateIsZero",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "NotActionableBlock",
+    "name": "NotAContract",
     "inputs": []
   },
   {
@@ -1595,7 +1332,17 @@
   },
   {
     "type": "error",
+    "name": "NotEnoughBoostedBalance",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "NotEnoughTime",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotFactoryVault",
     "inputs": []
   },
   {
@@ -1605,17 +1352,12 @@
   },
   {
     "type": "error",
-    "name": "NotFriendOfTheChef",
+    "name": "NotIncentiveManager",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "NotGovernance",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotInitializing",
+    "name": "NotNewOperator",
     "inputs": []
   },
   {
@@ -1625,40 +1367,13 @@
   },
   {
     "type": "error",
-    "name": "NotProver",
+    "name": "NotWhitelistedVault",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "NotRootFollower",
+    "name": "OperatorAlreadySet",
     "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotValidatorOrOperator",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "OwnableInvalidOwner",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "OwnableUnauthorizedAccount",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
   },
   {
     "type": "error",
@@ -1667,17 +1382,12 @@
   },
   {
     "type": "error",
-    "name": "PayoutTokenIsZero",
+    "name": "RewardAllocationAlreadyQueued",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "QueuedCuttingBoardNotFound",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "QueuedCuttingBoardNotReady",
+    "name": "RewardAllocationBlockDelayTooLarge",
     "inputs": []
   },
   {
@@ -1687,28 +1397,17 @@
   },
   {
     "type": "error",
-    "name": "RewardCycleStarted",
+    "name": "RewardsDurationIsZero",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "SafeCastOverflowedUintDowncast",
-    "inputs": [
-      {
-        "name": "bits",
-        "type": "uint8",
-        "internalType": "uint8"
-      },
-      {
-        "name": "value",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
+    "name": "StakeAmountIsZero",
+    "inputs": []
   },
   {
     "type": "error",
-    "name": "StakeAmountIsZero",
+    "name": "TimestampAlreadyProcessed",
     "inputs": []
   },
   {
@@ -1733,22 +1432,6 @@
   },
   {
     "type": "error",
-    "name": "Unauthorized",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "VaultAlreadyExists",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "VotesExpiredSignature",
     "inputs": [
       {
@@ -1766,6 +1449,16 @@
   {
     "type": "error",
     "name": "ZeroAddress",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ZeroOperatorOnFirstDeposit",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ZeroPercentageWeight",
     "inputs": []
   }
 ]
