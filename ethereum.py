@@ -1,7 +1,7 @@
 from web3 import Web3
 from utils import http_json_call
 
-from metrics_enum import MetricsUrlStatus
+from metrics_enum import MetricsUrlStatus, TokenType
 
 
 def get_evm_chains_data(rpc_call_status_counter):
@@ -25,7 +25,23 @@ def get_chain_symbol(chain_id, chain_data):
 
 def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_evm):
     try:
+        balances = []
         addr = wallet["address"]
+        
+        web3 = Web3(Web3.HTTPProvider(apiprovider))
+        balance = web3.eth.get_balance(addr)
+        balance_ether = web3.from_wei(balance, "ether")
+        chain_id = web3.eth.chain_id
+        symbol = get_chain_symbol(chain_id=chain_id, chain_data=chains_evm)
+        rpc_call_status_counter.labels(
+            url=apiprovider, status=MetricsUrlStatus.SUCCESS.value
+        ).inc()
+        balances.append({
+            "balance": balance_ether,
+            "symbol": symbol,
+            "token_type": TokenType.NATIVE.value
+        })
+
         # if it is erc20
         if "contract_address" in wallet:
             contract_address = wallet["contract_address"]
@@ -38,17 +54,13 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_ev
             rpc_call_status_counter.labels(
                 url=apiprovider, status=MetricsUrlStatus.SUCCESS.value
             ).inc()
-            return {"balance": erc20_data["balance"], "symbol": erc20_data["symbol"]}
-        else:
-            web3 = Web3(Web3.HTTPProvider(apiprovider))
-            balance = web3.eth.get_balance(addr)
-            balance_ether = web3.from_wei(balance, "ether")
-            chain_id = web3.eth.chain_id
-            symbol = get_chain_symbol(chain_id=chain_id, chain_data=chains_evm)
-            rpc_call_status_counter.labels(
-                url=apiprovider, status=MetricsUrlStatus.SUCCESS.value
-            ).inc()
-            return {"balance": balance_ether, "symbol": symbol}
+            balances.append({
+                "balance": erc20_data["balance"],
+                "symbol": erc20_data["symbol"],
+                "token_type": TokenType.ERC_20.value
+            })
+
+        return balances
     except Exception as addr_balancer_err:
         rpc_call_status_counter.labels(
             url=apiprovider, status=MetricsUrlStatus.FAILED.value
