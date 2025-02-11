@@ -39,7 +39,7 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_ev
             {
                 "balance": balance_ether,
                 "symbol": symbol,
-                "token_type": TokenType.NATIVE.value
+                "token_type": TokenType.NATIVE.value,
             }
         )
 
@@ -59,7 +59,7 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_ev
                 {
                     "balance": erc20_data["balance"],
                     "symbol": erc20_data["symbol"],
-                    "token_type": TokenType.ERC_20.value
+                    "token_type": TokenType.ERC_20.value,
                 }
             )
 

@@ -76,7 +76,7 @@ class AppMetrics:
                 )
             ) / (10 ** chain_registry["decimals"])
             self.logging.info(
-                f"{wallet['address']} has {balance} {chain_registry["symbol"]}"
+                f"{wallet['address']} has {balance} {chain_registry['symbol']}"
             )
             self.account_info.labels(
                 network=network_name,
