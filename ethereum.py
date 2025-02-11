@@ -1,7 +1,6 @@
-from web3 import Web3
-from utils import http_json_call
-
 from metrics_enum import MetricsUrlStatus, TokenType
+from utils import http_json_call
+from web3 import Web3
 
 
 def get_evm_chains_data(rpc_call_status_counter):
@@ -27,7 +26,7 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_ev
     try:
         balances = []
         addr = wallet["address"]
-        
+
         web3 = Web3(Web3.HTTPProvider(apiprovider))
         balance = web3.eth.get_balance(addr)
         balance_ether = web3.from_wei(balance, "ether")
@@ -36,11 +35,13 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_ev
         rpc_call_status_counter.labels(
             url=apiprovider, status=MetricsUrlStatus.SUCCESS.value
         ).inc()
-        balances.append({
-            "balance": balance_ether,
-            "symbol": symbol,
-            "token_type": TokenType.NATIVE.value
-        })
+        balances.append(
+            {
+                "balance": balance_ether,
+                "symbol": symbol,
+                "token_type": TokenType.NATIVE.value
+            }
+        )
 
         # if it is erc20
         if "contract_address" in wallet:
@@ -54,11 +55,13 @@ def get_ethereum_balance(apiprovider, wallet, rpc_call_status_counter, chains_ev
             rpc_call_status_counter.labels(
                 url=apiprovider, status=MetricsUrlStatus.SUCCESS.value
             ).inc()
-            balances.append({
-                "balance": erc20_data["balance"],
-                "symbol": erc20_data["symbol"],
-                "token_type": TokenType.ERC_20.value
-            })
+            balances.append(
+                {
+                    "balance": erc20_data["balance"],
+                    "symbol": erc20_data["symbol"],
+                    "token_type": TokenType.ERC_20.value
+                }
+            )
 
         return balances
     except Exception as addr_balancer_err:

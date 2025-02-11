@@ -76,17 +76,20 @@ class AppMetrics:
                 )
             ) / (10 ** chain_registry["decimals"])
             self.logging.info(
-                f"{wallet['address']} has {balance} {chain_registry['symbol']}"
+                f"{wallet['address']} has {balance} {chain_registry["symbol"]}"
             )
             self.account_info.labels(
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
-                token=chain_registry['symbol'],
+                token=chain_registry["symbol"],
                 token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.BALANCE.value,
             ).set(balance)
-        elif network_type == NetworkType.EVM.value or network_type == NetworkType.BERA.value:
+        elif (
+            network_type == NetworkType.EVM.value
+            or network_type == NetworkType.BERA.value
+        ):
             balances_data = get_ethereum_balance(
                 apiprovider=network["api"],
                 wallet=wallet,
@@ -143,7 +146,7 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
-                token=chain_registry['symbol'],
+                token=chain_registry["symbol"],
                 token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.DELEGATIONS.value,
             ).set(delegations)
@@ -190,7 +193,7 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
-                token=chain_registry['symbol'],
+                token=chain_registry["symbol"],
                 token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.UNBOUNDING_DELEGATIONS.value,
             ).set(unbounding_delegations)
@@ -213,7 +216,7 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
-                token=chain_registry['symbol'],
+                token=chain_registry["symbol"],
                 token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.REWARDS.value,
             ).set(rewards)
