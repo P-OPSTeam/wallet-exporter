@@ -5,7 +5,6 @@ import os
 import time
 
 from bera import (
-    get_bera_balance,
     get_bera_boostees,
     get_bera_boosts,
     get_bera_queued_boost,
@@ -20,7 +19,7 @@ from cosmos import (
 )
 from dotenv import load_dotenv
 from ethereum import get_ethereum_balance, get_evm_chains_data
-from metrics_enum import MetricsAccountInfo, NetworkType
+from metrics_enum import MetricsAccountInfo, NetworkType, TokenType
 from prometheus_client import Counter, Gauge, start_http_server
 from substrate import get_substrate_account_balance
 from utils import configure_logging, read_config_file
@@ -43,7 +42,7 @@ class AppMetrics:
         self.account_info = Gauge(
             "account_info",
             "account information",
-            ["address", "name", "network", "type"],
+            ["address", "name", "network", "type", "token", "token_type"],
         )
         self.rpc_call_status_counter = Counter(
             "rpc_call_status",
@@ -79,19 +78,36 @@ class AppMetrics:
             self.logging.info(
                 f"{wallet['address']} has {balance} {chain_registry['symbol']}"
             )
-        elif network_type == NetworkType.EVM.value:
-            balance_data = get_ethereum_balance(
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                token=chain_registry["symbol"],
+                token_type=TokenType.NATIVE.value,
+                type=MetricsAccountInfo.BALANCE.value,
+            ).set(balance)
+        elif (
+            network_type == NetworkType.EVM.value
+            or network_type == NetworkType.BERA.value
+        ):
+            balances_data = get_ethereum_balance(
                 apiprovider=network["api"],
                 wallet=wallet,
                 rpc_call_status_counter=self.rpc_call_status_counter,
                 chains_evm=self.chains_evm,
             )
-            balance = balance_data["balance"]
-            symbol = balance_data["symbol"]
-            if "contract_address" in wallet:
+            for balance_data in balances_data:
+                balance = balance_data["balance"]
+                symbol = balance_data["symbol"]
                 self.logging.info(f"{wallet['address']} has {balance} {symbol}")
-            else:
-                self.logging.info(f"{wallet['address']} has {balance} {symbol}")
+                self.account_info.labels(
+                    network=network_name,
+                    address=wallet["address"],
+                    name=wallet["name"],
+                    token_type=balance_data["token_type"],
+                    token=symbol,
+                    type=MetricsAccountInfo.BALANCE.value,
+                ).set(balance)
         elif network_type == NetworkType.SUBSTRATE.value:
             substrate_info = get_substrate_account_balance(
                 node_url=network["api"],
@@ -103,23 +119,14 @@ class AppMetrics:
             )
             symbol = substrate_info.get("symbol")
             self.logging.info(f"{wallet['address']} has {balance} {symbol}")
-        elif network_type == NetworkType.BERA.value:
-            balance = (
-                get_bera_balance(
-                    bgt_address=network["bgt_address"],
-                    wallet=wallet["address"],
-                    api=network["api"],
-                )
-                / 10**18
-            )
-            self.logging.info(f"{wallet['address']} has {balance} BGT")
-
-        self.account_info.labels(
-            network=network_name,
-            address=wallet["address"],
-            name=wallet["name"],
-            type=MetricsAccountInfo.BALANCE.value,
-        ).set(balance)
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                token=symbol,
+                token_type=TokenType.NATIVE.value,
+                type=MetricsAccountInfo.BALANCE.value,
+            ).set(balance)
 
     def fetch_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
@@ -139,6 +146,8 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token=chain_registry["symbol"],
+                token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.DELEGATIONS.value,
             ).set(delegations)
 
@@ -155,11 +164,13 @@ class AppMetrics:
                 )
                 / 10**18
             )
-            self.logging.info(f"{wallet['address']} has {bera_boosts} bera boosts")
+            self.logging.info(f"{wallet['address']} has {bera_boosts} bgt boosts")
             self.account_info.labels(
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token="BGT",
+                token_type=TokenType.ERC_20.value,
                 type=MetricsAccountInfo.BOOSTS.value,
             ).set(bera_boosts)
 
@@ -182,6 +193,8 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token=chain_registry["symbol"],
+                token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.UNBOUNDING_DELEGATIONS.value,
             ).set(unbounding_delegations)
 
@@ -203,6 +216,8 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token=chain_registry["symbol"],
+                token_type=TokenType.NATIVE.value,
                 type=MetricsAccountInfo.REWARDS.value,
             ).set(rewards)
 
@@ -226,6 +241,8 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token="BGT",
+                token_type=TokenType.ERC_20.value,
                 type=MetricsAccountInfo.VALIDATOR_BOOSTEES.value,
             ).set(bera_boostees)
 
@@ -249,6 +266,8 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token="BGT",
+                token_type=TokenType.ERC_20.value,
                 type=MetricsAccountInfo.UNBOOSTED.value,
             ).set(bera_unboosted)
 
@@ -272,6 +291,8 @@ class AppMetrics:
                 network=network_name,
                 address=wallet["address"],
                 name=wallet["name"],
+                token="BGT",
+                token_type=TokenType.ERC_20.value,
                 type=MetricsAccountInfo.QUEUED_BOOST.value,
             ).set(bera_queued_boost)
 

@@ -22,3 +22,8 @@ class NetworkType(Enum):
     EVM = "evm"
     SUBSTRATE = "substrate"
     BERA = "bera"
+
+
+class TokenType(Enum):
+    ERC_20 = "erc20"
+    NATIVE = "native"
