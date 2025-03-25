@@ -105,11 +105,16 @@ def get_rewards(apiprovider, addr: str, maindenom, rpc_call_status_counter):
         raise addr_balancer_err
 
 
-def get_cosmos_registry(rpc_call_status_counter):
+def get_cosmos_registry(network, rpc_call_status_counter):
     try:
         params: dict = {}
+        registry_url = (
+            "https://chains.cosmos.directory"
+            if network == "mainnet"
+            else "https://chains.testcosmos.directory"
+        )
         d = http_json_call(
-            url="https://chains.cosmos.directory",
+            url=registry_url,
             rpc_call_status_counter=rpc_call_status_counter,
             params=params,
         )

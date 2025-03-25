@@ -49,7 +49,12 @@ class AppMetrics:
             "Count the number of success or failed http call for a given url",
             ["url", "status"],
         )
-        self.cosmos_registry = get_cosmos_registry(self.rpc_call_status_counter)
+        self.cosmos_registry = get_cosmos_registry(
+            "mainnet", self.rpc_call_status_counter
+        )
+        self.cosmos_testnet_registry = get_cosmos_registry(
+            "testnet", self.rpc_call_status_counter
+        )
         self.chains_evm = get_evm_chains_data(self.rpc_call_status_counter)
 
         logging.debug(walletconfig)
@@ -314,10 +319,16 @@ class AppMetrics:
                         chain_registry = chain
                         break
                 if chain_registry is None:
-                    self.logging.error(
-                        f"Cannot find chain {network} in cosmos registry"
-                    )
-                    continue
+                    # check if it exists in testnet
+                    for chain in self.cosmos_testnet_registry:
+                        if chain["name"] == network["name"]:
+                            chain_registry = chain
+                            break
+                    if chain_registry is None:
+                        self.logging.error(
+                            f"Cannot find chain {network} in cosmos registry"
+                        )
+                        continue
 
             for wallet in network["wallets"]:
                 try:
