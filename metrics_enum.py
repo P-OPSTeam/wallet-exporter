@@ -22,6 +22,7 @@ class NetworkType(Enum):
     EVM = "evm"
     SUBSTRATE = "substrate"
     BERA = "bera"
+    SOLANA = "solana"
 
 
 class TokenType(Enum):

@@ -21,6 +21,7 @@ from dotenv import load_dotenv
 from ethereum import get_ethereum_balance, get_evm_chains_data
 from metrics_enum import MetricsAccountInfo, NetworkType, TokenType
 from prometheus_client import Counter, Gauge, start_http_server
+from solana_wallet import get_solana_balance
 from substrate import get_substrate_account_balance
 from utils import configure_logging, read_config_file
 
@@ -118,6 +119,23 @@ class AppMetrics:
                 "decimals"
             )
             symbol = substrate_info.get("symbol")
+            self.logging.info(f"{wallet['address']} has {balance} {symbol}")
+            self.account_info.labels(
+                network=network_name,
+                address=wallet["address"],
+                name=wallet["name"],
+                token=symbol,
+                token_type=TokenType.NATIVE.value,
+                type=MetricsAccountInfo.BALANCE.value,
+            ).set(balance)
+        elif network_type == NetworkType.SOLANA.value:
+            solana_info = get_solana_balance(
+                rpc_url=network["rpc"],
+                address=wallet["address"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+            balance = solana_info.get("balance")
+            symbol = solana_info.get("symbol")
             self.logging.info(f"{wallet['address']} has {balance} {symbol}")
             self.account_info.labels(
                 network=network_name,

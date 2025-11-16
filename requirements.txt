@@ -6,3 +6,5 @@ structlog
 web3
 polkadot
 substrate-interface
+solana
+solders
