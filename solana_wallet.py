@@ -1,11 +1,10 @@
 import base64
 import struct
 
+from solders.pubkey import Pubkey
+from metrics_enum import MetricsUrlStatus
 from solana.rpc.api import Client
 from solana.rpc.types import TokenAccountOpts
-from solders.pubkey import Pubkey
-
-from metrics_enum import MetricsUrlStatus
 
 
 def get_solana_balance(rpc_url, address: str, rpc_call_status_counter):
