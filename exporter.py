@@ -62,6 +62,18 @@ class AppMetrics:
             self.fetch()
             time.sleep(self.polling_interval_seconds)
 
+    def _set_balance_metric(self, network_name, wallet, balance, symbol, token_type):
+        """Helper method to set balance metrics and log information."""
+        self.logging.info(f"{wallet['address']} has {balance} {symbol}")
+        self.account_info.labels(
+            network=network_name,
+            address=wallet["address"],
+            name=wallet["name"],
+            token=symbol,
+            token_type=token_type,
+            type=MetricsAccountInfo.BALANCE.value,
+        ).set(balance)
+
     def fetch_balance(self, network, wallet, chain_registry):
         network_name = network["name"]
         network_type = network["type"]
@@ -76,17 +88,13 @@ class AppMetrics:
                     self.rpc_call_status_counter,
                 )
             ) / (10 ** chain_registry["decimals"])
-            self.logging.info(
-                f"{wallet['address']} has {balance} {chain_registry['symbol']}"
+            self._set_balance_metric(
+                network_name,
+                wallet,
+                balance,
+                chain_registry["symbol"],
+                TokenType.NATIVE.value,
             )
-            self.account_info.labels(
-                network=network_name,
-                address=wallet["address"],
-                name=wallet["name"],
-                token=chain_registry["symbol"],
-                token_type=TokenType.NATIVE.value,
-                type=MetricsAccountInfo.BALANCE.value,
-            ).set(balance)
         elif (
             network_type == NetworkType.EVM.value
             or network_type == NetworkType.BERA.value
@@ -119,15 +127,9 @@ class AppMetrics:
                 "decimals"
             )
             symbol = substrate_info.get("symbol")
-            self.logging.info(f"{wallet['address']} has {balance} {symbol}")
-            self.account_info.labels(
-                network=network_name,
-                address=wallet["address"],
-                name=wallet["name"],
-                token=symbol,
-                token_type=TokenType.NATIVE.value,
-                type=MetricsAccountInfo.BALANCE.value,
-            ).set(balance)
+            self._set_balance_metric(
+                network_name, wallet, balance, symbol, TokenType.NATIVE.value
+            )
         elif network_type == NetworkType.SOLANA.value:
             solana_info = get_solana_balance(
                 rpc_url=network["rpc"],
@@ -136,15 +138,9 @@ class AppMetrics:
             )
             balance = solana_info.get("balance")
             symbol = solana_info.get("symbol")
-            self.logging.info(f"{wallet['address']} has {balance} {symbol}")
-            self.account_info.labels(
-                network=network_name,
-                address=wallet["address"],
-                name=wallet["name"],
-                token=symbol,
-                token_type=TokenType.NATIVE.value,
-                type=MetricsAccountInfo.BALANCE.value,
-            ).set(balance)
+            self._set_balance_metric(
+                network_name, wallet, balance, symbol, TokenType.NATIVE.value
+            )
 
     def fetch_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]
