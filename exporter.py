@@ -23,6 +23,7 @@ from metrics_enum import MetricsAccountInfo, NetworkType, TokenType
 from prometheus_client import Counter, Gauge, start_http_server
 from solana_wallet import get_solana_balance
 from substrate import get_substrate_account_balance
+from sui import get_sui_balance_simple
 from utils import configure_logging, read_config_file
 
 
@@ -138,6 +139,16 @@ class AppMetrics:
             )
             balance = solana_info.get("balance")
             symbol = solana_info.get("symbol")
+            self._set_balance_metric(
+                network_name, wallet, balance, symbol, TokenType.NATIVE.value
+            )
+        elif network_type == NetworkType.SUI.value:
+            balance = get_sui_balance_simple(
+                rpc_url=network["rpc"],
+                address=wallet["address"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+            symbol = "SUI"
             self._set_balance_metric(
                 network_name, wallet, balance, symbol, TokenType.NATIVE.value
             )
