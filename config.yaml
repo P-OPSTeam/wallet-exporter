@@ -41,4 +41,11 @@ networks:
     type: bera
     wallets:
       - name: bera validator
-        address: "0xDcCE0cB56b5a94bD6A5A889b324342981C3c16d4"    
+        address: "0xDcCE0cB56b5a94bD6A5A889b324342981C3c16d4"
+  - name: solana-mainnet
+    rpc: !!str https://api.mainnet-beta.solana.com
+    api: !!str https://api.mainnet-beta.solana.com
+    type: solana
+    wallets:
+    - name: my-solana-wallet
+      address: YourSolanaWalletAddressHere

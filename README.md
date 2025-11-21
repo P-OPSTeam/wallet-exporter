@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ## Edit config.yaml
 
-Supported types of wallet: cosmos, evm, substrate (polkadot for example)
+Supported types of wallet: cosmos, evm, substrate (polkadot for example), solana
 
 For cosmos wallets (celestia for example), the name of the network must match what is in ```https://chains.cosmos.directory```
 
@@ -29,6 +29,8 @@ For evm wallets, if it is an erc20 token, you need to specify the contract addre
 Replace the 'API', 'RPC' accordingly (for example, use ```https://moonbeam.public.blastapi.io``` if you use the moonbeam evm)
 
 For berachain wallet, you need to specify the bgt token contract address (see config.yaml as example).
+
+For solana wallets, you need to specify the RPC endpoint (e.g., ```https://api.mainnet-beta.solana.com``` for mainnet or ```https://api.devnet.solana.com``` for devnet).
 
 ## Run it
 
@@ -86,6 +88,17 @@ The type "validator_boostees" is the amount of BGT attributed to the validator f
 The type "unboosted" is the unboosted balance of an account
 
 The type "queued_boost" is the amount of BGT queued up to be used by an account for boosts
+
+## Solana
+
+For Solana wallets, the exporter will track SOL balance:
+
+```bash
+Example
+curl -s localhost:9877/metric
+
+account_info{address="YourSolanaAddressHere",name="my-solana-wallet",network="solana-mainnet",token="SOL",token_type="native",type="balance"} 12.345678
+```
 
 ## TODO
 
