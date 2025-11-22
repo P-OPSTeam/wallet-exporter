@@ -5,16 +5,20 @@ from urllib.parse import urlparse
 import requests
 import structlog
 import yaml
+from metrics_enum import MetricsUrlStatus
 from requests.exceptions import HTTPError
 
-from metrics_enum import MetricsUrlStatus
 
-
-def http_json_call(url, params, rpc_call_status_counter):
+def http_json_call(url, params, rpc_call_status_counter, method="GET"):
     parsed_url = urlparse(url)
     server = f"{parsed_url.scheme}://{parsed_url.netloc}"
     try:
-        r = requests.get(url, params=params)
+        if method.upper() == "POST":
+            r = requests.post(
+                url, json=params, headers={"Content-Type": "application/json"}
+            )
+        else:
+            r = requests.get(url, params=params)
         r.raise_for_status()
     except HTTPError as http_err:
         rpc_call_status_counter.labels(

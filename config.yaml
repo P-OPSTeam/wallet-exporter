@@ -47,5 +47,12 @@ networks:
     api: !!str https://api.mainnet-beta.solana.com
     type: solana
     wallets:
-    - name: my-solana-wallet
-      address: YourSolanaWalletAddressHere
+      - name: my-solana-wallet
+        address: YourSolanaWalletAddressHere
+  - name: sui-mainnet
+    rpc: https://fullnode.mainnet.sui.io:443
+    api: https://fullnode.mainnet.sui.io:443
+    type: sui
+    wallets:
+      - name: my-sui-wallet
+        address: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
