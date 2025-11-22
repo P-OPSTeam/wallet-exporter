@@ -147,6 +147,16 @@ class AppMetrics:
             self._set_balance_metric(
                 network_name, wallet, balance, symbol, TokenType.NATIVE.value
             )
+        elif network_type == NetworkType.SUI.value:
+            balance = get_sui_balance_simple(
+                rpc_url=network["rpc"],
+                address=wallet["address"],
+                rpc_call_status_counter=self.rpc_call_status_counter,
+            )
+            symbol = "SUI"
+            self._set_balance_metric(
+                network_name, wallet, balance, symbol, TokenType.NATIVE.value
+            )
 
     def fetch_delegations(self, network, wallet, chain_registry):
         network_name = network["name"]

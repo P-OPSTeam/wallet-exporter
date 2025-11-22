@@ -5,9 +5,8 @@ from urllib.parse import urlparse
 import requests
 import structlog
 import yaml
-from requests.exceptions import HTTPError
-
 from metrics_enum import MetricsUrlStatus
+from requests.exceptions import HTTPError
 
 
 def http_json_call(url, params, rpc_call_status_counter, method="GET"):

@@ -22,14 +22,14 @@ def get_sui_balance(rpc_url, address, rpc_call_status_counter):
             "jsonrpc": "2.0",
             "id": 1,
             "method": "suix_getAllBalances",
-            "params": [address]
+            "params": [address],
         }
 
         response = http_json_call(
             url=rpc_url,
             rpc_call_status_counter=rpc_call_status_counter,
             params=payload,
-            method="POST"
+            method="POST",
         )
 
         if "result" not in response:
@@ -45,29 +45,22 @@ def get_sui_balance(rpc_url, address, rpc_call_status_counter):
             # SUI native token has 9 decimals
             if coin_type == "0x2::sui::SUI":
                 balance_sui = total_balance / 10**9
-                balances.append({
-                    "balance": balance_sui,
-                    "symbol": "SUI",
-                    "coin_type": coin_type
-                })
+                balances.append(
+                    {"balance": balance_sui, "symbol": "SUI", "coin_type": coin_type}
+                )
             else:
                 # For other tokens, we'll need to fetch metadata
                 # For now, just store the raw balance
-                symbol = (coin_type.split("::")[-1]
-                          if "::" in coin_type else "UNKNOWN")
-                balances.append({
-                    "balance": total_balance,
-                    "symbol": symbol,
-                    "coin_type": coin_type
-                })
+                symbol = coin_type.split("::")[-1] if "::" in coin_type else "UNKNOWN"
+                balances.append(
+                    {"balance": total_balance, "symbol": symbol, "coin_type": coin_type}
+                )
 
         # If no balances found, return zero balance for SUI
         if not balances:
-            balances.append({
-                "balance": 0.0,
-                "symbol": "SUI",
-                "coin_type": "0x2::sui::SUI"
-            })
+            balances.append(
+                {"balance": 0.0, "symbol": "SUI", "coin_type": "0x2::sui::SUI"}
+            )
 
         rpc_call_status_counter.labels(
             url=rpc_url, status=MetricsUrlStatus.SUCCESS.value
@@ -99,17 +92,14 @@ def get_sui_balance_simple(rpc_url, address, rpc_call_status_counter):
             "jsonrpc": "2.0",
             "id": 1,
             "method": "suix_getBalance",
-            "params": [
-                address,
-                "0x2::sui::SUI"
-            ]
+            "params": [address, "0x2::sui::SUI"],
         }
 
         response = http_json_call(
             url=rpc_url,
             rpc_call_status_counter=rpc_call_status_counter,
             params=payload,
-            method="POST"
+            method="POST",
         )
 
         if "result" not in response:
